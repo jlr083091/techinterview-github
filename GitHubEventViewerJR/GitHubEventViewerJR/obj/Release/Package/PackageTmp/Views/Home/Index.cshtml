@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Github Event Viewer - Home Page";
+}
+
+<style>
+    button {
+        background-color: #77b300; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+    }
+</style>
+
+<div class="jumbotron">
+    @if (!String.IsNullOrEmpty(ViewBag.HitLimitError))
+            {
+        <p class="text-danger">ERROR: @ViewBag.HitLimitError</p>
+    }
+    else if (!String.IsNullOrEmpty(ViewBag.Error))
+    {
+        <p class="text-danger">ERROR: @ViewBag.Error</p>
+    }
+    else
+    {
+        <button type="button" onClick="window.location.reload()">Refresh Page</button>
+        <h3>Latest events</h3>
+
+
+        foreach (var item in Model)
+        {
+            <div onclick="location.href='@Url.Action("UserEventDetails/" + item.actor.display_login + "/" + item.id, "Home")';" style="cursor: pointer; border-width: 2px; border-style: hidden; padding: 10px" onMouseOver="this.style.backgroundColor='#77b300'" onMouseOut="this.style.backgroundColor='inherit'">
+                <img alt="&#64;@item.actor.login" src="@(item.actor.avatar_url + "&amp;s=40")" width="40" height="40">
+                The <strong>@item.type</strong> was conducted by User: <strong>@item.actor.display_login</strong> in : <strong>@item.repo.name</strong>
+            </div>
+        }
+    }
