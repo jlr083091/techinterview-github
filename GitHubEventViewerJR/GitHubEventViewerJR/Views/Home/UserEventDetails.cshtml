@@ -1,0 +1,227 @@
+﻿@model GitHubEventViewerJR.Models.Event
+@{
+    ViewBag.Title = "Event Details";
+}
+
+<h5>
+    <p>
+        <a href="javascript:history.back()">Back list of events</a>
+    </p>
+</h5>
+
+<h2>
+
+    <img alt="&#64;@Model.actor.display_login" src="@(Model.actor.avatar_url + "&amp;s=40")" width="40" height="40">
+    <a href="http://github.com/@Model.actor.display_login">
+        @Model.actor.display_login
+
+    </a>event details
+</h2>
+
+<div>
+    <hr />
+    @if (!String.IsNullOrEmpty(ViewBag.EventNotFoundError))
+    {
+        <p class="text-danger">ERROR: @ViewBag.EventNotFoundError</p>
+    }
+    else if (!String.IsNullOrEmpty(ViewBag.HitLimitError))
+    {
+        <p class="text-danger">ERROR: @ViewBag.HitLimitError</p>
+    }
+    else if (!String.IsNullOrEmpty(ViewBag.Error))
+    {
+        <p class="text-danger">ERROR: @ViewBag.Error</p>
+    }
+    else
+    {
+        <h6>
+            <dl>
+                <dt>Public: @Html.DisplayFor(model => model._public)</dt>
+                <dd>@Model.type</dd>
+                <dt>ID: @Model.id</dt>
+                <dt>Created at: @Model.created_at</dt>
+                <dt>Repo: <a href="http://github.com/@Model.repo.name" target="_blank">@Model.repo.name</a></dt>
+            </dl>
+        </h6>
+
+        if (Model.type == "ForkEvent")
+        {
+            <h3>Fork Info</h3>
+            <dl>
+                <dt>Repo:</dt>
+                <dd><a href=@Model.payload.forkee.html_url>@Model.payload.forkee.full_name</a></dd>
+                <dt>Fork created at:</dt>
+                <dd>@Model.payload.forkee.created_at</dd>
+                <dt>Watchers:</dt>
+                <dd>@Model.payload.forkee.watchers</dd>
+                <dt>Fork has issues:</dt>
+                <dd>@Model.payload.forkee.has_issues (@Model.payload.forkee.open_issues_count)</dd>
+            </dl>
+        }
+        else if (Model.type == "PushEvent")
+        {
+            <h3>Push Details</h3>
+            <dl>
+                <dt>Branch:</dt>
+                <dd>@Model.payload._ref</dd>
+                <dt>Commits:</dt>
+                <dd>
+                    @foreach (var item in @Model.payload.commits)
+                    {
+                        <ul>
+                            <li>Author name: @item.author.name</li>
+                            <li>Author email: @item.author.email</li>
+                            <li>Commit message: @item.message</li>
+                            <li>Commit URL: <a href=@item.url>@item.url</a></li>
+                        </ul>
+                        <hr />
+                    }
+                </dd>
+            </dl>
+        }
+        else if (Model.type == "PullRequestEvent")
+        {
+            <h3>Pull Request Details</h3>
+            <dl>
+                <dt>Title:</dt>
+                <dd>@Model.payload.pull_request.title</dd>
+                <dt>Request ID:</dt>
+                <dd><a href=@Model.payload.pull_request.html_url>@Model.payload.pull_request.id</a></dd>
+                <dt>Requested by:</dt>
+                <dd><a href=@Model.payload.pull_request.user.html_url>@Model.payload.pull_request.user.login</a></dd>
+                <dt>State:</dt>
+                <dd>@Model.payload.pull_request.state</dd>
+                <dt>Request body:</dt>
+                <dd>@Model.payload.pull_request.body</dd>
+                <dt>Created at:</dt>
+                <dd>@Model.payload.pull_request.created_at</dd>
+                <dt>From repo:</dt>
+                <dd><a href=@Model.payload.pull_request.head.repo.html_url>@Model.payload.pull_request.head.repo.full_name</a></dd>
+                <dt>To repo:</dt>
+                <dd><a href=@Model.payload.pull_request._base.repo.html_url>@Model.payload.pull_request._base.repo.full_name</a></dd>
+                <dt>Number of commits:</dt>
+                <dd>@Model.payload.pull_request.commits</dd>
+                <dt>Merged:</dt>
+                <dd>@Model.payload.pull_request.merged</dd>
+            </dl>
+        }
+        else if (Model.type == "PullRequestReviewCommentEvent")
+        {
+            <h3>Pull Request Review Comment Details</h3>
+            <dl>
+                <dt>Comment user:</dt>
+                <dd><a href=@Model.payload.comment.user.url>@Model.payload.comment.user.login</a></dd>
+                <dt>Comment ID:</dt>
+                <dd><a href=@Model.payload.comment.html_url>@Model.payload.comment.id</a></dd>
+                <dt>Comment:</dt>
+                <dd>@Model.payload.comment.body</dd>
+                <dt>Created at:</dt>
+                <dd>@Model.payload.comment.created_at</dd>
+                <dt></dt>
+                <dd></dd>
+
+                <dt>Pull request:</dt>
+                <dd><a href=@Model.payload.pull_request.html_url>@Model.payload.pull_request.id</a></dd>
+                <dt>Pull request state:</dt>
+                <dd>@Model.payload.pull_request.state</dd>
+                <dt>Pull request title:</dt>
+                <dd>@Model.payload.pull_request.title</dd>
+                <dt>Pull request description:</dt>
+                <dd>@Model.payload.pull_request.body</dd>
+
+            </dl>
+        }
+        else if (Model.type == "IssueCommentEvent")
+        {
+            <h3>Issue Comment Info</h3>
+            <dl>
+                <dt>Issue ID:</dt>
+                <dd><a href=@Model.payload.issue.html_url>@Model.payload.issue.id</a></dd>
+                <dt>Issue title:</dt>
+                <dd>@Model.payload.issue.title</dd>
+                <dt>Issued added by:</dt>
+                <dd>
+                    <a href="http://github.com/@Model.payload.issue.user.html_url">
+                        @Model.payload.issue.user.login
+                        <img alt="&#64;@Model.payload.issue.user.login" src="@(Model.payload.issue.user.avatar_url + "&amp;s=40")" width="20" height="20">
+                    </a>
+                </dd>
+                <dt>Issue state:</dt>
+                <dd>@Model.payload.issue.state</dd>
+                <dt>Issue text:</dt>
+                <dd>@Model.payload.issue.body</dd>
+
+                <dt></dt>
+                <dd></dd>
+                <dt>Comment ID:</dt>
+                <dd>
+                    <a href="http://github.com/@Model.payload.comment.user.html_url">
+                        @Model.payload.comment.user.login
+                        <img alt="&#64;@Model.payload.comment.user.login" src="@(Model.payload.comment.user.avatar_url + "&amp;s=40")" width="20" height="20">
+                    </a>
+                </dd>
+                <dt>Created at:</dt>
+                <dd>@Model.payload.comment.created_at</dd>
+                <dt>Comment text:</dt>
+                <dd>@Model.payload.comment.body</dd>
+            </dl>
+        }
+        else if (Model.type == "IssuesEvent")
+        {
+            <h3>Issues Info</h3>
+            <dl>
+                <dt>Action:</dt>
+                <dd>@Model.payload.action</dd>
+                <dt>Issue ID:</dt>
+                <dd><a href=@Model.payload.issue.html_url>@Model.payload.issue.id</a></dd>
+                <dt>Issue title:</dt>
+                <dd>@Model.payload.issue.title</dd>
+                <dt>Created by:</dt>
+                <dd>
+                    <a href="http://github.com/@Model.payload.issue.user.html_url">
+                        @Model.payload.issue.user.login
+                        <img alt="&#64;@Model.payload.issue.user.login" src="@(Model.payload.issue.user.avatar_url + "&amp;s=40")" width="20" height="20">
+                    </a>
+                </dd>
+                <dt>Issue text:</dt>
+                <dd>@Model.payload.issue.body</dd>
+            </dl>
+        }
+        else if (Model.type == "DeleteEvent")
+        {
+            <h3>Delete Info</h3>
+            <dl>
+                <dt>Ref:</dt>
+                <dd>@Model.payload._ref</dd>
+                <dt>Ref type:</dt>
+                <dd>@Model.payload.ref_type</dd>
+                <dt>Pusher type:</dt>
+                <dd>@Model.payload.pusher_type</dd>
+            </dl>
+        }
+        else if (Model.type == "CreateEvent")
+        {
+            <h3>Create Info</h3>
+            <dl>
+                <dt>Ref:</dt>
+                <dd>@Model.payload._ref</dd>
+                <dt>Ref type:</dt>
+                <dd>@Model.payload.ref_type</dd>
+                <dt>Pusher type:</dt>
+                <dd>@Model.payload.pusher_type</dd>
+                <dt>Master branch:</dt>
+                <dd>@Model.payload.master_branch</dd>
+                <dt>Description:</dt>
+                <dd>@Model.payload.description</dd>
+            </dl>
+        }
+        else if (Model.type == "WatchEvent")
+        {
+            <h3>Watch Info</h3>
+            <dl>
+                <dt>Action:</dt>
+                <dd>@Model.payload.action</dd>
+            </dl>
+        }
+    }
+</div>
